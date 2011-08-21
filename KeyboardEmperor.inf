@@ -24,8 +24,8 @@ ErrorControl   = %SERVICE_ERROR_IGNORE%
 ServiceBinary  = %12%\keyboardemperor.sys
 
 [Strings]
-KeyboardEmperor.SvcDesc	= "Keyboard Emperor Driver"
-KeyboardEmperor.MediaDesc 	= "Keyboard Emperor Driver Disc"
+KeyboardEmperor.SvcDesc	  = "Keyboard Emperor Driver"
+KeyboardEmperor.MediaDesc = "Keyboard Emperor Driver Disc"
 
 SERVICE_KERNEL_DRIVER = 1
 SERVICE_DEMAND_START  = 3

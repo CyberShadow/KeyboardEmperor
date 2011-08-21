@@ -18,8 +18,12 @@
  #error Operating system not supported
 #endif
 
-VOID
-GetDriverObjectList()
+LARGE_INTEGER old_duetime;
+LONG old_period;
+BOOLEAN initialization_status;
+
+BOOLEAN
+SetKeyboardParameters(LARGE_INTEGER new_duetime, LONG new_period, PLARGE_INTEGER old_duetime, PLONG old_period)
 {
 	DRIVER_OBJECT *driverobj;
 	UNICODE_STRING name;
@@ -32,23 +36,43 @@ GetDriverObjectList()
 
 	RtlInitUnicodeString(&name, L"\\Driver\\kbdhid");
 
+	driverobj = NULL;
 	ObReferenceObjectByName(&name, 0, NULL, 0, *IoDriverObjectType, KernelMode, NULL, &driverobj);
 
-	// This is not thread-safe. Hold your breath and hope the device chain won't be updated as this list is traversed.
+	if (!driverobj)
+	{
+		DbgPrint("kbdhid driver not loaded\n");
+		return FALSE;
+	}
+
+	if (!driverobj->DeviceObject)
+	{
+		DbgPrint("kbdhid driver has no devices\n");
+		return FALSE;
+	}
+
+	// This is not thread-safe. Hold our breath and hope the device chain won't be updated as this list is traversed.
+	#pragma warning(disable:28175)
 	for (device = driverobj->DeviceObject; device != NULL; device = device->NextDevice)
 	{
 		extension = device->DeviceExtension;
 		duetime = (PLARGE_INTEGER)((PCHAR)extension + OFFSET_DUETIME);
 		period  = (PLONG         )((PCHAR)extension + OFFSET_PERIOD );
-		DbgPrint("Before: duetime=%d, period=%d\n", duetime->LowPart, *period);
-		*period = 10;
-		duetime->LowPart = -2000000;
-		DbgPrint("After : duetime=%d, period=%d\n", duetime->LowPart, *period);
+
+		if (old_duetime) *old_duetime = *duetime;
+		if (old_period ) *old_period  = *period ;
+		DbgPrint("Before: duetime=%I64d, period=%d\n", duetime->QuadPart, *period);
+
+		*duetime = new_duetime;
+		*period  = new_period;
+		DbgPrint("After : duetime=%I64d, period=%d\n", duetime->QuadPart, *period);
 	}
 
 	ObDereferenceObject(driverobj);
 
 	//DbgPrint("End enum!\n");
+
+	return TRUE;
 }
 
 DRIVER_INITIALIZE DriverEntry;
@@ -60,10 +84,17 @@ DriverEntry(
 	)
 
 {
-	GetDriverObjectList();
+	LARGE_INTEGER new_duetime;
 
 	DriverObject->DriverUnload = DriverUnload;
-	return STATUS_SUCCESS;
+
+	new_duetime.QuadPart = -2000000LL;
+	initialization_status = SetKeyboardParameters(new_duetime, 10, &old_duetime, &old_period);
+
+	if (initialization_status)
+		return STATUS_SUCCESS;
+	else
+		return STATUS_NOT_FOUND;
 }
 
 VOID
@@ -73,4 +104,6 @@ DriverUnload(
 
 {
 	//DbgPrint("Driver is being unloaded!\n");
+	if (initialization_status)
+		SetKeyboardParameters(old_duetime, old_period, NULL, NULL);
 }

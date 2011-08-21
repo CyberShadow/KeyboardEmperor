@@ -4,8 +4,6 @@
 DRIVER_UNLOAD DriverUnload;
 VOID DriverUnload( IN PDRIVER_OBJECT DriverObject );
 
-VOID GetDriverObjectList ();
-
 NTSTATUS
 ObReferenceObjectByName (
     IN PUNICODE_STRING ObjectName,
