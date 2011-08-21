@@ -1,8 +1,6 @@
 [Version]
 signature = "$Windows NT$"
  
-; Distribution Media information
-;
 [SourceDisksNames]
 1 = %KeyboardEmperor.MediaDesc%
 
@@ -10,20 +8,13 @@ signature = "$Windows NT$"
 keyboardemperor.sys = 1
 
 [DestinationDirs]
-; Driver to be installed in the drivers subdirectory.
-DefaultDestDir = 12	; DIRID_DRIVERS
+DefaultDestDir = %DIRID_DRIVERS%
 
 [DefaultInstall]
-; DefaultInstall section is used to install the class filter driver. Use .NT platform extension so this
-; section won't be executed on Windows 9x/ME.
 CopyFiles = @keyboardemperor.sys
  
 [DefaultInstall.Services]
-;
-; Services section is required for installation of drivers on NT-based operating systems.
-;
 AddService = keyboardemperor, , keyboardemperor_Service_Inst
-
 
 [keyboardemperor_Service_Inst]
 DisplayName    = %KeyboardEmperor.SvcDesc%
@@ -33,16 +24,10 @@ ErrorControl   = %SERVICE_ERROR_IGNORE%
 ServiceBinary  = %12%\keyboardemperor.sys
 
 [Strings]
-;
-; Change the service description to describe your driver.
-;
 KeyboardEmperor.SvcDesc	= "Keyboard Emperor Driver"
-
-; Change the media description to describe your media.
-;
 KeyboardEmperor.MediaDesc 	= "Keyboard Emperor Driver Disc"
 
-; Useful constants
 SERVICE_KERNEL_DRIVER = 1
 SERVICE_DEMAND_START  = 3
 SERVICE_ERROR_IGNORE  = 0
+DIRID_DRIVERS         = 12
