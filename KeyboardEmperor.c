@@ -8,7 +8,7 @@
 #endif
 
 #if _AMD64_
- #if _WIN32_WINNT==0x0600
+ #if (_WIN32_WINNT==0x0600) || (_WIN32_WINNT==0x0601)
   #define OFFSET_DUETIME 0x1C0
   #define OFFSET_PERIOD  0x1C8
  #endif
