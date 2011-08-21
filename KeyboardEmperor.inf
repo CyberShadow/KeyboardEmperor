@@ -19,7 +19,7 @@ AddService = keyboardemperor, , keyboardemperor_Service_Inst
 [keyboardemperor_Service_Inst]
 DisplayName    = %KeyboardEmperor.SvcDesc%
 ServiceType    = %SERVICE_KERNEL_DRIVER%
-StartType      = %SERVICE_DEMAND_START%
+StartType      = %SERVICE_AUTO_START%
 ErrorControl   = %SERVICE_ERROR_IGNORE%
 ServiceBinary  = %12%\keyboardemperor.sys
 
@@ -28,6 +28,6 @@ KeyboardEmperor.SvcDesc	  = "Keyboard Emperor Driver"
 KeyboardEmperor.MediaDesc = "Keyboard Emperor Driver Disc"
 
 SERVICE_KERNEL_DRIVER = 1
-SERVICE_DEMAND_START  = 3
+SERVICE_AUTO_START    = 2
 SERVICE_ERROR_IGNORE  = 0
 DIRID_DRIVERS         = 12
