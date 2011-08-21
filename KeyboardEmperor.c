@@ -52,6 +52,7 @@ SetKeyboardParameters(LARGE_INTEGER new_duetime, LONG new_period, PLARGE_INTEGER
 	}
 
 	// This is not thread-safe. Hold our breath and hope the device chain won't be updated as this list is traversed.
+	// The list should only change when USB keyboards are plugged in or unplugged, though.
 	#pragma warning(disable:28175)
 	for (device = driverobj->DeviceObject; device != NULL; device = device->NextDevice)
 	{
