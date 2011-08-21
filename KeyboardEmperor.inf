@@ -1,0 +1,71 @@
+[Version]
+signature = "$Windows NT$"
+ 
+; Distribution Media information
+;
+[SourceDisksNames]
+1 = %KeyboardEmperor.MediaDesc%
+
+[SourceDisksFiles]
+keyboardemperor.sys = 1
+
+[DestinationDirs]
+; Driver to be installed in the drivers subdirectory.
+DefaultDestDir = 12	; DIRID_DRIVERS
+
+[DefaultInstall]
+; DefaultInstall section is used to install the class filter driver. Use .NT platform extension so this
+; section won't be executed on Windows 9x/ME.
+CopyFiles = @keyboardemperor.sys
+AddReg = ClassFilter_AddReg
+ 
+[ClassFilter_AddReg]
+;
+; Change {setup-ClassGUID} to the string form of the ClassGUID that you are installing the filter on.
+;
+; Change UpperFilters to LowerFilters if this is a lower class filter.
+;
+HKLM, System\CurrentControlSet\Control\Class\{4d36e97d-e325-11ce-bfc1-08002be10318}, UpperFilters, 0x00010008, keyboardemperor
+
+
+[DefaultInstall.Services]
+;
+; Services section is required for installation of drivers on NT-based operating systems.
+;
+AddService = keyboardemperor, , keyboardemperor_Service_Inst, keyboardemperor_EventLog_Inst
+
+
+[keyboardemperor_Service_Inst]
+DisplayName    = %KeyboardEmperor.SvcDesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_IGNORE%
+ServiceBinary  = %12%\keyboardemperor.sys
+
+
+[keyboardemperor_EventLog_Inst]
+AddReg = keyboardemperor_EventLog_AddReg
+
+
+[keyboardemperor_EventLog_AddReg]
+HKR,,EventMessageFile, %REG_EXPAND_SZ%,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\keyboardemperor.sys"
+HKR,,TypesSupported, %REG_DWORD%, 7
+
+
+[Strings]
+;
+; Change the service description to describe your driver.
+;
+KeyboardEmperor.SvcDesc	= "Keyboard Emperor Driver"
+
+; Change the media description to describe your media.
+;
+KeyboardEmperor.MediaDesc 	= "Keyboard Emperor Driver Disc"
+
+
+; Useful constants
+SERVICE_KERNEL_DRIVER = 1
+SERVICE_DEMAND_START  = 3
+SERVICE_ERROR_IGNORE  = 0
+REG_EXPAND_SZ         = 0x00020000
+REG_DWORD             = 0x00010001
